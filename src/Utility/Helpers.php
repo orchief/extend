@@ -85,146 +85,6 @@ function user_md5($str, $salt = '')
 }
 
 /**
- * 终止程序返回json数据.
- *
- * @param array $jsonBody 返回的json
- * @param int   $httpCode http code
- */
-function json($data = [], $code = 200, $httpcode = 200, $header = [], $options = [])
-{
-    $Body = [
-        'code' => $code,
-        'data' => $data,
-    ];
-
-    $response = think\Response::create($Body, 'json', $httpcode, $header, $options);
-    throw new think\exception\HttpResponseException($response);
-}
-
-/**
- * 获取 / 设置配置信息
- *
- * @param string $name
- * @param string $value
- * @return mixed
- */
-function setting($name = null, $value = null)
-{
-    $value = \app\admin\model\Setting::where(['name' => $name])->value('value');
-    $arrV = json_decode($value, true);
-    foreach($arrV as $k => $v){
-        $res[$v['name']] = $v['value'];
-    }
-    return $res;
-}
-
-/**
- * 终止程序返回json数据.
- *
- * @param array $jsonBody 返回的json
- * @param int   $httpCode http code
- */
-function abort($data = [], $code = 400, $httpcode = 200, $header = [], $options = [])
-{
-    if (!is_array($data)) {
-        $data = ['msg' => $data];
-    }
-    $Body = [
-        'code' => $code,
-        'data' => $data,
-    ];
-
-    $response = think\Response::create($Body, 'json', $httpcode, $header, $options);
-    throw new think\exception\HttpResponseException($response);
-}
-
-/**
- * Undocumented function.
- */
-function continue_if($bool, $data, $code = 400, $httpcode = 200, $header = [], $options = [])
-{
-    if (!$bool) {
-        if (!is_array($data)) {
-            $data = ['msg' => $data];
-        }
-        json($data, $code, $httpcode, $header, $options);
-    }
-
-    return $bool;
-}
-
-/**
- * 抛出异常或者程序继续执行.
- *
- * @param boolen $boolen 需要检验的结果 为true 则程序继续运行 否则抛出异常
- */
-function throw_if($boolen, $msg)
-{
-    if (!$boolen) {
-        throw new \Exception(json_encode($msg, JSON_UNESCAPED_UNICODE));
-    }
-
-    return $boolen;
-}
-
-function result($res, $data = [], $code = 400, $httpcode = 200, $header = [], $options = [])
-{
-    if ($res || is_array($res)) {
-        json($res, 200, $httpcode, $header, $options);
-    } else {
-        if (!is_array($data)) {
-            $data = ['msg' => $data];
-        }
-        json($data, $code, $httpcode, $header, $options);
-    }
-}
-
-/**
- * 验证数据 (数据 默认为请求参数).
- *
- * @param array $rules Rules of inspection
- * @param array $field field 注释
- * @param array $data  data
- */
-function validates($rules, $field = [], $data = null, $msg = [])
-{
-    if (null == $data) {
-        $data = \think\facade\Request::instance()->param();
-    }
-
-    foreach ($rules as $k => $v) {
-        if ([] != $field) {
-            $field_keys = array_keys($field);
-            if (!in_array($k, $field_keys)) {
-                $field[$k] = $k;
-            }
-        }
-    }
-
-    $validator = new \Utility\Validate($rules, $msg, $field);
-    continue_if($validator->check($data), $validator->getError());
-}
-
-/**
- * 获取当前用户的userId.
- */
-function userId()
-{
-    if (isset($GLOBALS['_userId'])) {
-        return $GLOBALS['_userId'];
-    }
-
-    continue_if(isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION'], '请登录！', 403);
-
-    $userId = continue_if(\Utility\JWT::get('userId'), '没有访问权限！', 403);
-
-    // 存储UserId
-    $GLOBALS['_userId'] = decodeUserId(\Utility\JWT::get('userId'));
-
-    return $userId;
-}
-
-/**
  * 将字符串类型参数转换为数组.
  *
  * @param [type] $str
@@ -334,7 +194,6 @@ function encodeUserId($userId, $salt = 0)
     return $encoded;
 }
 
-
 /**
  * 通过银行名称查询银行编码
  *
@@ -355,57 +214,6 @@ function getBankleitzahlByBankNo($bankNo)
         return "OTHER";
     } else {
         return $curl->response;
-    }
-}
-
-/**
- * 获取当前登录 用户信息
- *
- * @param [type] $field
- * @return void
- */
-function userInfo($field = null, $value = null)
-{
-    if(!is_array($field) && $value == null){        // 获取
-        $userId = \Utility\JWT::get('userId');
-        if(!$userId){
-            return null;
-        }
-        if(null == $field){
-            return \app\user\model\Members::get($userId);
-        }
-        return \app\user\model\Members::where(['userId' => $userId])->value($field);
-    }
-
-    if(null != $field && !is_array($field) && $value != null){        // 设置
-        if(!userId()){
-            return null;
-        }
-        
-        return \app\user\model\Members::where(['userId' => userId()])->update($field, $value);
-    }
-}
-
-/**
- * 数据库事务函数
- * @param function $func 匿名函数
- * @param object $model 执行事务的主model
- * @return void
- */
-function trans($func, $model)
-{
-    $model->startTrans();
-    try{
-        call_user_func($func);
-        $model->commit();
-    }catch(\Exception $th){
-        $model->rollback();
-        if ($th instanceof \think\exception\HttpResponseException) {
-            $res = json_decode($th->getResponse()->getContent(), true);
-            result($res['data'], $res['code']);
-        } else {
-            abort($th->getMessage(), 500);
-        }
     }
 }
 
@@ -434,37 +242,6 @@ function getOrderId($salt = '')
 {
     return $salt.substr(userId(), -5).rand(10000, 99999).time();
 }
-
-// /**
-//  * cookies加密函数
-//  * @param string 加密后字符串
-//  */
-// function encrypt($data, $key = 'kls8in1e')
-// {
-//     $prep_code = serialize($data);
-//     $block = openssl_cipher_iv_length('AES-256-CBC');
-//     if (($pad = $block - (strlen($prep_code) % $block)) < $block) {
-//         $prep_code .= str_repeat(chr($pad), $pad);
-//     }
-//     $encrypt = mcrypt_encrypt(MCRYPT_DES, $key, $prep_code, MCRYPT_MODE_ECB);
-//     return base64_encode($encrypt);
-// }
-
-// /**
-//  * cookies 解密密函数
-//  * @param array 解密后数组
-//  */
-// function decrypt($str, $key = 'kls8in1e')
-// {
-//     $str = base64_decode($str);
-//     $str = mcrypt_decrypt(MCRYPT_DES, $key, $str, MCRYPT_MODE_ECB);
-//     $block = openssl_cipher_iv_length('AES-256-CBC');
-//     $pad = ord($str[($len = strlen($str)) - 1]);
-//     if ($pad && $pad < $block && preg_match('/' . chr($pad) . '{' . $pad . '}$/', $str)) {
-//         $str = substr($str, 0, strlen($str) - $pad);
-//     }
-//     return unserialize($str);
-// }
 
 /**
  * 字符加密，一次一密,可定时解密有效
@@ -510,7 +287,6 @@ function encrypt($string,$key = 'kls8in1e', $expiry = 0){
     $result = str_replace(array('+', '/', '='),array('-', '_', '.'), $result);
     return $result;
 }
-
 
 /**
  * 字符解密，一次一密,可定时解密有效
