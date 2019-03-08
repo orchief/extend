@@ -189,9 +189,9 @@ class Common
     protected function getTplFullPath()
     {
         if ($this->input->getOption('plain')) {
-            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'extend' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
+            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
         } else {
-            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'extend' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
+            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
         }
 
         return  $fullPath;
