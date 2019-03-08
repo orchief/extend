@@ -179,7 +179,6 @@ class Bank{
      * @return void
      */
     static function getBankNameByCode($code){
-        $bankListStr = file_get_contents(env('root_path') . 'extend/Bank/bankList.json');
         try{
             return static::$bankListArr[$code];
         }catch(\Exception $e){
