@@ -22,7 +22,16 @@
         "php-curl-class/php-curl-class": "^8.0"
     },
     "autoload": {
-        "psr-4": {"Box\\": "src/"},
+        "psr-4": {
+            "Bank\\": "src/Bank",
+            "com\\": "src/com",
+            "command\\": "src/command",
+            "Express\\": "src/Express",
+            "Mail\\": "src/Mail",
+            "Push\\": "src/Push",
+            "Rest\\": "src/Rest",
+            "Utility\\": "src/Utility"
+          },
         "files": [
             "src/Utility/Helpers.php"
         ]
