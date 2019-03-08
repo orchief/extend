@@ -174,6 +174,16 @@ class Bank{
     ];
 
     /**
+     * 银行卡logo图片地址
+     */
+    protected $logoPath = 'http://logo.pstech360.com/png/';
+
+    /**
+     * 阿里提供的对外公开的通过银行卡号查询银行卡基本信息的接口
+     */
+    protected $aliApi = 'https://ccdcapi.alipay.com/validateAndCacheCardInfo.json';
+
+    /**
      * 通过银行编码获取银行名称
      *
      * @return void
@@ -185,4 +195,39 @@ class Bank{
             return null;
         }
     }
-} 
+
+    /**
+     * 通过银行名称查询银行编码
+     *
+     * @param [type] $bankName
+     * @return void
+     */
+    static function getBankleitzahlByBankNo($bankNo)
+    {
+        $curl = new \Curl\Curl();
+        $data = [
+            '_input_charset'    =>  'utf-8',
+            'cardNo'            =>  $bankNo,
+            'cardBinCheck'      =>  'true'
+        ];
+        $curl->get(self::$aliApi, $data);
+
+        if ($curl->error) {
+            return "OTHER";
+        } else {
+            $res = $curl->response;
+
+            if($res->bank){
+                $res->bankName = self::getBankNameByCode($res->bank);
+            };
+
+            $resArr = [];
+            $resArr['bankName'] = $res->bankName;
+            $resArr['cardType'] = $res->cardType;
+            $resArr['bank'] = $res->bank;
+            $resArr['key'] = $res->key;
+            $resArr['bankLogo'] = self::$logoPath . '/' .$resArr['bank'] . '.png';
+            return $resArr;
+        }
+    }
+}
