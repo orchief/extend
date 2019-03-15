@@ -201,16 +201,16 @@ trait Url2Sql
                     if (array_key_exists($v, $this->param) && is_array($this->param[$v]) && count($this->param[$v])) {
                         // 数组模式
                         $this->param[$v] = $this->str2arr($this->param[$v]);
-                        if(is_array($this->param[$k])){
+                        if(is_array($this->param[$v])){
                             if (isset($this->param[$v][0])) {
                                 $this->where[] = [
-                                    $this->name.'.'.$v, 'in', $this->param[$k],
+                                    $this->name.'.'.$v, 'in', $this->param[$v],
                                 ];
                             }
                         }else{
                             if (isset($this->param[$v][0])) {
                                 $this->where[] = [
-                                    $this->name.'.'.$v, '=', $this->param[$k],
+                                    $this->name.'.'.$v, '=', $this->param[$v],
                                 ];
                             }
                         }
