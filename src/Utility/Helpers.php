@@ -49,9 +49,9 @@ function rulesDeal($data)
         foreach ($data as $k1 => $v1) {
             $str1 = $v1['name'];
             if (is_array($v1['child'])) {
-                foreach ($v1['child'] as $k2 => $v2) {
+                foreach (isset($v1['child']) && $v1['child'] as $k2 => $v2) {
                     $str2 = $str1.'-'.$v2['name'];
-                    if (is_array($v2['child'])) {
+                    if (isset($v1['child']) && is_array($v2['child'])) {
                         foreach ($v2['child'] as $k3 => $v3) {
                             $str3 = $str2.'-'.$v3['name'];
                             $ret[] = $str3;

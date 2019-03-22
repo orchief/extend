@@ -226,11 +226,13 @@ class Model extends ThinkModel
      */
     public function map(&$field)
     {
-        // json 格式化字段
-        if ($this->jsonFields) {
-            foreach ($this->jsonFields as $k => $v) {
-                if($field){
-                    $field[$v] = json_decode($field[$v], true);
+        if($field ){
+            // json 格式化字段
+            if ($this->jsonFields) {
+                foreach ($this->jsonFields as $k => $v) {
+                    if($field){
+                        $field[$v] = json_decode($field[$v], true);
+                    }
                 }
             }
         }

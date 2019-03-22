@@ -27,7 +27,6 @@ class HandleException extends Handle
             $trace = $res['trace'];
             unset($res['trace']);
             unset($res['previous']);
-            unset($res['code']);
             
             $res['trace'] = $trace;
 
@@ -39,7 +38,6 @@ class HandleException extends Handle
             $trace = $res['trace'];
             unset($res['trace']);
             unset($res['previous']);
-            unset($res['code']);
 
             $res['trace'] = $trace;
             \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));

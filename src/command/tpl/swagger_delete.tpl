@@ -13,7 +13,7 @@
     *             type="integer",
     *             format="int64",
     *         )
-    *     )
+    *     ),
     *     @OA\Response(
     *         response=400,
     *         description="Invalid input"

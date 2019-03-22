@@ -44,7 +44,6 @@ class Controller extends ThinkController
     protected function params($param = [])
     {
         $origin = $this->request->param();
-        unset($origin['userId']);
         return array_replace_recursive($origin, $param);
     }
 }
