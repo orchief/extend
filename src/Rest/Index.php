@@ -10,7 +10,6 @@ namespace Rest;
 
 trait Index
 {
-    
     public function index()
     {
         $param = $this->params();

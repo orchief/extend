@@ -36,7 +36,7 @@ class JWT
      * @param [type] $name
      * @param [type] $value
      */
-    public static function set($name, $value = null)
+    public static function set($name, $value = null, $key = null)
     {
         static::$preload = self::get();
         static::$preload['expire'] = time();    // 秘钥生成时间
@@ -48,8 +48,10 @@ class JWT
             static::$preload[$name] = $value;
         }
 
+        if($key == null){
+            $key = Config::get('app.jwt.key'); // 签名秘钥
+        }
         // 生成用户秘钥
-        $key = Config::get('app.jwt.key'); // 签名秘钥
         self::$encoded = jwtoken::encode(static::$preload, $key);
         header('authorization: '.self::$encoded);
     }
@@ -59,7 +61,7 @@ class JWT
      *
      * @param [type] $name
      */
-    public static function get($name = null)
+    public static function get($name = null, $key = null)
     {
         // 检查 static::$decoded
         if ([] == static::$preload) {
@@ -70,7 +72,10 @@ class JWT
                 return [];
             }
             $authorization = str_replace('Bearer ', '', $authorization);
-            $key = Config::get('app.jwt.key'); // 签名秘钥
+            
+            if($key == null){
+                $key = Config::get('app.jwt.key'); // 签名秘钥
+            }
             try {
                 self::$preload = static::object_array(jwtoken::decode($authorization, $key, array('HS256')));
                 if (!static::$preload) {
