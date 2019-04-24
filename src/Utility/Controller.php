@@ -41,9 +41,15 @@ class Controller extends ThinkController
     /** 
      * 获取所有参数
      */
-    protected function params($param = [])
+    protected function params($param = null, $default = null)
     {
-        $origin = $this->request->param();
-        return array_replace_recursive($origin, $param);
+        if(is_array($param)){
+            $origin = $this->request->param();
+            return array_replace_recursive($origin, $param);
+        }
+
+        if($param){
+            $this->request->param($param, $default);
+        }
     }
 }

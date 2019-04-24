@@ -29,8 +29,9 @@ class HandleException extends Handle
             unset($res['previous']);
             
             $res['trace'] = $trace;
-
-            \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
+            if(config('app.mail.bugreport')){
+                \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
+            }
             return response($res, 200, [], 'json');
         } else {
             $res = ['code' => 500, 'msg' => $e->getMessage(), 'line' => $e->getLine(), 'file' => $e->getFile(), 'trace' => $e->getTrace(), 'previous' => $e->getPrevious(), 'param' => Request::param()];
@@ -40,7 +41,9 @@ class HandleException extends Handle
             unset($res['previous']);
 
             $res['trace'] = $trace;
-            \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
+            if(config('app.mail.bugreport')){
+                \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
+            }
             return response(['code' => 500, 'msg' => '服务器异常！'], 500, [], 'json');
         }
     }

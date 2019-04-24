@@ -296,20 +296,6 @@ class Common
                 continue;
             }
 
-            /*
-     *     @OA\Parameter(
-     *         name="petId",
-     *         in="path",
-     *         description="ID of pet to return",
-     *         required=true,
-     *         @OA\Schema(
-     *             type="integer",
-     *             format="int64"
-     *         )
-     *     ),
-     *
-            */
-
             $this->swaggerParameter .= '*     @OA\Parameter(
     *         name="'.$v['COLUMN_NAME'].'",
     *         in="query",
@@ -352,7 +338,7 @@ class Common
                 $this->ranges .= '"'.$v['COLUMN_NAME'].'",';
             }
 
-            // 字段类型为 date
+            // 字段类型为 json
             if ($this->getFieldType($v['DATA_TYPE']) == 'json') {
                 $this->jsonFields .= '"'.$v['COLUMN_NAME'].'",';
             }
