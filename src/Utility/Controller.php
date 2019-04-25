@@ -41,7 +41,7 @@ class Controller extends ThinkController
     /** 
      * 获取所有参数
      */
-    protected function params($param = null, $default = null)
+    protected function params($param = null)
     {
         if(is_array($param)){
             $origin = $this->request->param();
@@ -49,7 +49,7 @@ class Controller extends ThinkController
         }
 
         if($param){
-            $this->request->param($param, $default);
+            $this->request->param($param, null);
         }
     }
 }
