@@ -1,273 +1,110 @@
 <?php
-
 namespace Utility;
 
 /**
- * 将url根据规定的格式转换成 查询sql.
+ * 将url根据规定的格式转换成 查询sql
  */
-trait Url2Sql
-{
-    private $page = null;
-
-    protected $where = [];
-    protected $order = [];
+trait Url2Sql{
 
     /**
-     * param参数解析器.
-     *
-     * @param [type] $param
+     * 获取where查询条件
      */
-    protected function parseUrl($param)
+    public function buildparams($params, $configs = [])
     {
-        $this->param = $param;
-        $this->limit = isset($this->param['limit']) ? $this->param['limit'] : $this->limit;                 // 获取多少条数据
-        $this->offset = isset($this->param['offset']) ? $this->param['offset'] : $this->offset;             // 跳过多少条数据
-        $this->page = isset($this->param['page']) ? $this->param['page'] : null;                            // 按照页码查询
+        $search = isset($configs['search']) ? $configs['search'] : false;
+        $filter = isset($configs['filter']) ? $configs['filter'] : false;
+        $ranges = isset($configs['ranges']) ? $configs['ranges'] : false;
+        $in     = isset($configs['in']) ? $configs['in'] : false;
+        $sorts  = isset($configs['sorts']) ? $configs['sorts'] : false;
+        $where = [];
+        $order = [];
 
-        // 联合查询
-        $model = $this;
-        $model = $model->with($this->with);
-        if ($this->leftJoin) {
-            foreach ($this->leftJoin as $k => $v) {
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+        // 字段模糊查询 
+        if ($search) {
+            foreach ($search as $k => $v) {
+                if (array_key_exists($v, $params) && ($params[$v] or $params[$v] === "0" or $params[$v] === 0)) {
+                    $where[] = [
+                        $v, 'LIKE', '%' . $params[$v] . '%'
+                    ];
+                }
             }
         }
 
-        if ($param) {
-            $this->multiSearch();
-        }
-
-        if ($this->limit == -1) {
-            return $model->field($this->returnFields)->where($this->where)->order($this->order);
-        }
-        if (null != $this->page) {
-            return $model->field($this->returnFields)
-            ->where($this->where)->order($this->order)
-            ->page($this->page, $this->limit);
-        } else {
-            return $model->field($this->returnFields)
-            ->where($this->where)->order($this->order)
-            ->limit($this->offset, $this->limit);
-        }
-    }
-
-    /**
-     * param参数解析器.
-     *
-     * @param [type] $param
-     */
-    protected function getTotals($param)
-    {
-        $this->param = $param;
-        $this->limit = isset($this->param['limit']) ? $this->param['limit'] : $this->limit;                 // 获取多少条数据
-        $this->offset = isset($this->param['offset']) ? $this->param['offset'] : $this->offset;             // 跳过多少条数据
-        $this->page = isset($this->param['page']) ? $this->param['page'] : null;                            // 按照页码查询
-
-        // 联合查询
-        $model = $this;
-        if ($this->leftJoin) {
-            foreach ($this->leftJoin as $k => $v) {
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+        // 字段精确查询
+        if ($filter) {
+            foreach ($filter as $k => $v) {
+                if (array_key_exists($v, $params) && ($params[$v] or $params[$v] === "0" or $params[$v] === 0)) {
+                    $where[] = [
+                        $v, '=', $params[$v]
+                    ];
+                }
             }
         }
 
-        if ($param) {
-            $this->multiSearch();
-        }
-
-        return $model->where($this->where)->order($this->order);
-    }
-
-    /**
-     * 多条件查询.
-     */
-    protected function multiSearch()
-    {
-        // 模糊查询
-        if ($this->likeCons) {
-            foreach ($this->likeCons as $k => $v) {
-                if (!is_numeric($k)) {
-                    if (array_key_exists($k, $this->param) && ($this->param[$k] or $this->param[$k] === '0' or $this->param[$k] === 0)) {
-                        $this->param[$k] = $this->str2arr($this->param[$k]);
-                        if (is_string($this->param[$k]) or is_numeric($this->param[$k])) {
-                            $this->where[] = [
-                                $v.'.'.$k,  'like', '%'.$this->param[$k].'%',
-                            ];
+        // 范围查询
+        if ($ranges) {
+            foreach ($ranges as $k => $v) {
+                if (array_key_exists($v, $params) && ($params[$v] or $params[$v] === "0" or $params[$v] === 0)) {
+                    $params[$v] = str2Arr($params[$v]);
+                    $count = count($params[$v]);
+                    if($count == 1 || $count == 2){
+                        $sym = 'BETWEEN';
+                        if (!isset($params[$v][0])) {
+                            $sym = '<=';
+                            $params[$v] = $params[$v][1];
+                        } else if (!isset($params[$v][0])) {
+                            $sym = '>=';
+                            $params[$v] = $params[$v][0];
                         }
-                    }
-                } else {
-                    if (array_key_exists($v, $this->param) && ($this->param[$v] or $this->param[$v] === '0' or $this->param[$v] === 0)) {
-                        $this->param[$v] = $this->str2arr($this->param[$v]);
-                        if (is_string($this->param[$v]) or is_numeric($this->param[$v])) {
-                            $this->where[] = [
-                                $this->name.'.'.$v, 'like', '%'.$this->param[$v].'%',
-                            ];
-                        }
+                        $where[] = [$v, $sym, $params[$v]];
                     }
                 }
             }
         }
 
-        // 精确查询
-        if ($this->eqCons) {
-            foreach ($this->eqCons as $k => $v) {
-                if (!is_numeric($k)) {
-                    if (array_key_exists($k, $this->param) && ($this->param[$k] or $this->param[$k] === '0' or $this->param[$k] === 0)) {
-                        $this->param[$k] = $this->str2arr($this->param[$k]);
-                        if (is_string($this->param[$k]) or is_numeric($this->param[$k])) {
-                            $this->where[] = [
-                                $v.'.'.$k, '=', $this->param[$k],
-                            ];
-                        }
-                    }
-                } else {
-                    if (array_key_exists($v, $this->param) && ($this->param[$v] or $this->param[$v] === '0' or $this->param[$v] === 0)) {
-                        $this->param[$v] = $this->str2arr($this->param[$v]);
-                        if (is_string($this->param[$v]) or is_numeric($this->param[$v])) {
-                            $this->where[] = [
-                                $this->name.'.'.$v, '=', $this->param[$v],
-                            ];
-                        }
+        if ($in) {
+            foreach ($in as $k => $v) {
+                if (array_key_exists($v, $params) && is_array($params[$v]) && count($params[$v]) ) {
+                    $params[$v] = str2Arr($params[$v]);
+                    if(is_array($params[$v]) && count($params[$v])){
+                        $where[] = [
+                            $v, 'in', $params[$v]
+                        ];
                     }
                 }
             }
         }
 
-        // 范围
-        if ($this->ranges) {
-            foreach ($this->ranges as $k => $v) {
-                if (!is_numeric($k)) {
-                    if (array_key_exists($k, $this->param) && ($this->param[$k] or $this->param[$k] === '0' or $this->param[$k] === 0)) {
-                        // 数组模式
-                        $this->param[$k] = $this->str2arr($this->param[$k]);
-                        if (is_array($this->param[$k])) {
-                            // 最小值
-                            if (isset($this->param[$k][0])) {
-                                $this->where[] = [
-                                    $v.'.'.$k, '>=', $this->param[$k][0],
-                                ];
-                            }
-                            // 最大值
-                            if (isset($this->param[$k][1])) {
-                                $this->where[] = [
-                                    $v.'.'.$k, '<=', $this->param[$k][1],
-                                ];
-                            }
-                        }
-                    }
-                } else {
-                    if (array_key_exists($v, $this->param) && ($this->param[$v] or $this->param[$v] === '0' or $this->param[$v] === 0)) {
-                        // 数组模式
-                        $this->param[$v] = $this->str2arr($this->param[$v]);
-                        if (is_array($this->param[$v])) {
-                            // 最小值
-                            if (isset($this->param[$v][0])) {
-                                $this->where[] = [
-                                    $this->name.'.'.$v, '>=', $this->param[$v][0],
-                                ];
-                            }
-                            // 最大值
-                            if (isset($this->param[$v][1])) {
-                                $this->where[] = [
-                                    $this->name.'.'.$v, '<=', $this->param[$v][1],
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // where in
-        if ($this->whereIn) {
-            foreach ($this->whereIn as $k => $v) {
-                if (!is_numeric($k)) {
-                    if (array_key_exists($k, $this->param) && is_array($this->param[$k]) && count($this->param[$k])) {
-                        // 数组模式
-                        $this->param[$k] = $this->str2arr($this->param[$k]);
-                        if (isset($this->param[$k][0])) {
-                            if(is_array($this->param[$k])){
-                                $this->where[] = [
-                                    $v.'.'.$k, 'in', $this->param[$k],
-                                ];
-                            }else{
-                                $this->where[] = [
-                                    $v.'.'.$k, '=', $this->param[$k],
-                                ];
-                            }
-                        }
-                    }
-                } else {
-                    if (array_key_exists($v, $this->param) && is_array($this->param[$v]) && count($this->param[$v])) {
-                        // 数组模式
-                        $this->param[$v] = $this->str2arr($this->param[$v]);
-                        if(is_array($this->param[$v])){
-                            if (isset($this->param[$v][0])) {
-                                $this->where[] = [
-                                    $this->name.'.'.$v, 'in', $this->param[$v],
-                                ];
-                            }
-                        }else{
-                            if (isset($this->param[$v][0])) {
-                                $this->where[] = [
-                                    $this->name.'.'.$v, '=', $this->param[$v],
-                                ];
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-
-        // 排序
-        if ($this->sorts && isset($this->param['sorts'])) {
-            $sorts = $this->str2arr($this->param['sorts']);
+        if ($sorts && isset($params['sorts'])) {
+            $params['sorts'] = str2Arr($params['sorts']);
             foreach ($this->sorts as $k => $v) {
-                if (!is_numeric($k)) {
-                    $a = in_array($k, $sorts);
-                    $b = in_array('-'.$k, $sorts);
-
-                    if ($a) {
-                        $this->order[$v.'.'.$k] = 'asc';
-                    } elseif ($b) {
-                        $this->order[$v.'.'.$k] = 'desc';
-                    }
-                } else {
-                    $a = in_array($v, $sorts);
-                    $b = in_array('-'.$v, $sorts);
-                    if ($a) {
-                        $this->order[$this->name.'.'.$v] = 'asc';
-                    } elseif ($b) {
-                        $this->order[$this->name.'.'.$v] = 'desc';
-                    }
+                if(in_array($v, $params['sorts'])){
+                    $order[$v] = 'ASC';
+                }else if(in_array('-' . $v, $params['sorts'])){
+                    $order[$v] = 'DESC';
                 }
             }
         }
-    }
 
-    /**
-     * 将 逗号隔开 / json 字符格式的数据格式化为数组.
-     */
-    protected function str2arr($str)
-    {
-        if (is_array($str)) {
-            return $str;
+        $offset = isset($param['offset']) && $param['offset'] ? $param['offset'] : 0;
+        if(isset($param['page'])){
+            $limit  = isset($param['limit'])  && $param['limit'] ? $param['limit'] : 20;
+            $offset = ($param['page'] - 1) * $limit;
+        } else {
+            $limit  = isset($param['limit'])  && $param['limit'] ? $param['limit'] : 20;
+            $offset = isset($param['offset']) && $param['offset'] ? $param['offset'] : 0;
         }
-    
-        $res1 = json_decode($str, true);
-    
-        if (is_array($res1)) {
-            return $res1;
-        }
-    
-        if(strpos($str,',') !== false){
-            $res2 = explode(',', $str);
-            if (is_array($res2)) {
-                return $res2;
+
+        $where = function ($query) use ($where) {
+            foreach ($where as $k => $v) {
+                if (is_array($v)) {
+                    call_user_func_array([$query, 'where'], $v);
+                } else {
+                    $query->where($v);
+                }
             }
-        }
-    
-        return $str;
+        };
+
+        return [$where, $order, $offset, $limit];
     }
 }

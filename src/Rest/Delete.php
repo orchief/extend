@@ -19,9 +19,10 @@ trait Delete
     {
         $param = $this->params();
         if(isset($param['userId'])){    // 需要权限的情况
-            $res = $this->model()->delUserDatas(str2Arr($id), $param['userId']);
+            $res = $this->model()->where('userId', $param['userId'])
+            ->where($this->model()->pk, 'in', str2Arr($id))->delete();
         }else{
-            $res = $this->model()->delDatas(str2Arr($id));
+            $res = $this->model()->where($this->model()->pk, 'in', str2Arr($id))->delete();
         }
         result(['msg' => '删除成功!']);
     }
