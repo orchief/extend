@@ -14,7 +14,7 @@
     *             format="int64",
     *         )
     *     ),
-    {$params}
+    {$params},
     *     @OA\Response(
     *         response=400,
     *         description="Invalid input"
