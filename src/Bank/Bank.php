@@ -219,7 +219,7 @@ class Bank{
 
             if($res->bank){
                 $res->bankName = self::getBankNameByCode($res->bank);
-            };
+            }
 
             $resArr = [];
             $resArr['bankName'] = $res->bankName;

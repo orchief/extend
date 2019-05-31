@@ -17,7 +17,7 @@ class Validate extends ThinkValidate
     protected function mobile($value, $rule)
     {
         $this->setTypeMsg('mobile', ':attribute必须为手机号');
-        $res = $this->regex($value, '/^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$/u');
+        $res = $this->regex($value, '/^(13[0-9]|14[5679]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$/u');
 
         return $res;
     }

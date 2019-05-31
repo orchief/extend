@@ -7,7 +7,7 @@ use Swift_Message;
 
 Class Mail
 {
-	public static function send($body, $projectName = '基础模板')
+	public static function send($body, $projectName = '基础模板', $from = '18230373213@163.com')
 	{
         // TODO: 检查当前环境是否为本地 
         $addr = $_SERVER['SERVER_ADDR'];
@@ -20,7 +20,7 @@ Class Mail
         }
 
         $transport = (new Swift_SmtpTransport('smtp.163.com', 25))
-        ->setUsername('18230373213@163.com')
+        ->setUsername($from)
         ->setPassword('035212a');
 
         $mailer = new Swift_Mailer($transport);
