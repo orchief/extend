@@ -168,14 +168,8 @@ class Model extends ThinkModel
      */
     public function getDataById($id)
     {
-        // 联合查询
-        $model = $this;
-        if ($model->leftJoin) {
-            foreach ($this->leftJoin as $k => $v) {
-                $model = $this->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
-            }
-        }
-        $res = $model->field($this->returnFields)->where($this->name.'.'.$this->pk, $id)->find();
+        $res = $this->parseUrl([])->where($this->name.'.'.$this->pk, $id)->find();
+        // $res = $model->field($this->returnFields)->where($this->name.'.'.$this->pk, $id)->find();
 
         $res = $this->filter([$res])[0];
 
@@ -238,6 +232,12 @@ class Model extends ThinkModel
         }
     }
 
+    public function validate($param, $scene)
+    {
+        $validate = validate($this->name);
+        continue_if(!$validate->hasScene($scene) or $validate->scene($scene)->check($param), ['msg' => $validate->getError()]);
+    }
+
     /**
      * [createData 新建].
      *
@@ -250,10 +250,6 @@ class Model extends ThinkModel
      */
     public function createData($param)
     {
-        // 验证
-        $validate = validate($this->name);
-        continue_if(!$validate->hasScene('create') or $validate->scene('create')->check($param), ['msg' => $validate->getError()]);
-
         // json 格式化字段
         if ($this->jsonFields) {
             foreach ($this->jsonFields as $k => $v) {
@@ -351,6 +347,30 @@ class Model extends ThinkModel
      *
      * @param mixed $ids
      */
+    public function del($ids)
+    {
+        try {
+            if (is_array($ids)) {
+                continue_if(!empty($ids), ['msg' => '删除失败!']);
+                $this->where($this->pk, 'in', $ids)->delete();
+            } else {
+                $this->where($this->pk, $ids)->delete();
+            }
+        } catch (\Exception $e) {
+            if (Config::get('app_debug')) {
+                abort(['msg' => $e->getMessage()]);
+            }
+            abort(['msg' => '删除失败!']);
+        }
+
+        return true;
+    }
+
+    /**
+     * [delDataById 根据id删除数据].
+     *
+     * @param mixed $ids
+     */
     public function delDatas($ids)
     {
         if ($this->softDelete == true) {
@@ -373,6 +393,21 @@ class Model extends ThinkModel
 
         return true;
     }
+
+    /**
+     * 多条件删除
+     *
+     * @return void
+     */
+    public function deletes($param)
+    {
+        continue_if($param != [], ['msg' => '禁止无条件删除！']);
+        $res = $this->parseUrl($param)->select()->toArray();
+        $ids = array_column($res, $this->getPk());
+        return $this->delDatas($ids);
+    }
+
+
 
     /**
      * [delDataById 根据id删除数据].

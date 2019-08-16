@@ -32,6 +32,10 @@ class HandleException extends Handle
             if(config('app.mail.bugreport')){
                 \Mail\Mail::send(json_encode($res, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT));
             }
+
+            \Sentry\init(['dsn' => 'https://3816b82a71644f5090633e9911553ee6@sentry.io/1510175' ]);
+            \Sentry\captureException($e);
+
             return response($res, 200, [], 'json');
         } else {
             $res = ['code' => 500, 'msg' => $e->getMessage(), 'line' => $e->getLine(), 'file' => $e->getFile(), 'trace' => $e->getTrace(), 'previous' => $e->getPrevious(), 'param' => Request::param()];

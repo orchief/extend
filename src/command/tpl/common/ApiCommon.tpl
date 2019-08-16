@@ -32,7 +32,7 @@ class ApiCommon extends Controller
         $ac = request()->action();
         $selfClass = get_class($this);
         $action = request()->action();
-        abort_if(property_exists($selfClass, $action), ['msg' => '方法不存在!'], 404);
+        continue_if(property_exists($selfClass, $action), ['msg' => '方法不存在!'], 404);
 
         // 不需要权限验证
         if($this->noAuth()){
@@ -46,7 +46,7 @@ class ApiCommon extends Controller
 
         // 权限验证
         userId() = JWT::get('userId');
-        abort_if(userId(), [ 'msg' => '权限不足!'], 403);
+        continue_if(userId(), [ 'msg' => '权限不足!'], 403);
     }
 
     /**

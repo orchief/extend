@@ -34,5 +34,5 @@ Class Mail
 
 		return $result;
 
-	}
+    }
 }

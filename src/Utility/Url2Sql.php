@@ -67,7 +67,12 @@ trait Url2Sql
         $model = $this;
         if ($this->leftJoin) {
             foreach ($this->leftJoin as $k => $v) {
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+                if(isset($v[3])){
+                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], $v[3]);
+                }else{
+                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+                }
+                
             }
         }
 

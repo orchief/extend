@@ -69,7 +69,11 @@ class JWT
             if (isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION']) {
                 $authorization = $_SERVER['HTTP_AUTHORIZATION'];
             } else {
-                return [];
+                if($name){
+                    return null;
+                }else{
+                    return [];
+                }
             }
             $authorization = str_replace('Bearer ', '', $authorization);
             
@@ -82,7 +86,11 @@ class JWT
                     static::$preload = [];
                 }
             } catch (\Exception $e) {
-                return [];
+                if($name){
+                    return null;
+                }else{
+                    return [];
+                }
             }
         }
 

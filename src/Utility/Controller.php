@@ -30,10 +30,15 @@ class Controller extends ThinkController
         if(null == $name){
             $name = $this->modelName;
         }
-        if($this->modelName == $name){
-            $this->model = model($name, 'model', false);
-            return $this->model;
-        }else{
+
+        try{
+            if($this->modelName == $name){
+                $this->model = model($name, 'model', false);
+                return $this->model;
+            }else{
+                return model($name, 'model', false);
+            }
+        }catch(\Exception $e){
             return model($name, 'model', false);
         }
     }
@@ -43,7 +48,12 @@ class Controller extends ThinkController
      */
     protected function params($param = [])
     {
+        $bodyData = file_get_contents('php://input');
+        $bodyData = json_decode($bodyData, true);
         $origin = $this->request->param();
-        return array_replace_recursive($origin, $param);
+        if(!$bodyData){
+            $bodyData = [];
+        }
+        return array_replace_recursive($origin, $bodyData, $param);
     }
 }
