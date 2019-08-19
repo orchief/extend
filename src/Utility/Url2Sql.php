@@ -29,7 +29,18 @@ trait Url2Sql
         $model = $model->with($this->with);
         if ($this->leftJoin) {
             foreach ($this->leftJoin as $k => $v) {
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+                if(isset($v[3])){
+                    $join = $v[3];
+                }else{
+                    $join = 'LEFT';
+                }
+                if(is_array($v[2])){
+                    $join_relate = array_values($v[2])[0].'.'.array_keys($v[2])[0];
+                    
+                }else{
+                    $join_relate = $this->name.'.'.$v[2];
+                }
+                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
             }
         }
 
@@ -68,11 +79,17 @@ trait Url2Sql
         if ($this->leftJoin) {
             foreach ($this->leftJoin as $k => $v) {
                 if(isset($v[3])){
-                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], $v[3]);
+                    $join = $v[3];
                 }else{
-                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+                    $join = 'LEFT';
                 }
-                
+                if(is_array($v[2])){
+                    $join_relate = array_values($v[2])[0].'.'.array_keys($v[2])[0];
+                    
+                }else{
+                    $join_relate = $this->name.'.'.$v[2];
+                }
+                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
             }
         }
 
