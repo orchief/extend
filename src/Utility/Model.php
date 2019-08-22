@@ -552,5 +552,20 @@ class Model extends ThinkModel
     }
 
 
-    
+    /**
+     * 多条件获取数据列表.
+     */
+    public function getSum($param, $field)
+    {
+        $res = [];
+        $param['page'] = 1;
+        $param['limit'] = 10;
+        if(is_array($field)){
+            foreach ($field as $key => $value) {
+                $res[$value] = $this->getTotals($param)->sum($value);
+            }
+        }
+        
+        return $res;
+    }
 }
