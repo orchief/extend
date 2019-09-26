@@ -40,7 +40,14 @@ trait Url2Sql
                 }else{
                     $join_relate = $this->name.'.'.$v[2];
                 }
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
+                if(is_array($v[0]))
+                {
+                $model = $model->join($v[0][0].' '.$v[0][1], $v[0][1].'.'.$v[1].'='.$join_relate, $join);
+                }
+                else
+                {
+                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
+                }
             }
         }
 
