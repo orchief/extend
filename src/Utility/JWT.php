@@ -53,7 +53,9 @@ class JWT
         }
         // 生成用户秘钥
         self::$encoded = jwtoken::encode(static::$preload, $key);
-        header('authorization: '.self::$encoded);
+        if (!headers_sent()) {
+            header('authorization: '.self::$encoded);
+        }
     }
 
     /**
