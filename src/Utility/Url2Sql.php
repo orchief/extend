@@ -42,7 +42,7 @@ trait Url2Sql
                 }
                 if(is_array($v[0]))
                 {
-                $model = $model->join($v[0][0].' '.$v[0][1], $v[0][1].'.'.$v[1].'='.$join_relate, $join);
+                    $model = $model->join($v[0][0].' '.$v[0][1], $v[0][1].'.'.$v[1].'='.$join_relate, $join);
                 }
                 else
                 {
@@ -76,6 +76,7 @@ trait Url2Sql
      */
     protected function getTotals($param)
     {
+        $this->where = [];
         $this->param = $param;
         $this->limit = isset($this->param['limit']) ? $this->param['limit'] : $this->limit;                 // 获取多少条数据
         $this->offset = isset($this->param['offset']) ? $this->param['offset'] : $this->offset;             // 跳过多少条数据
@@ -96,14 +97,21 @@ trait Url2Sql
                 }else{
                     $join_relate = $this->name.'.'.$v[2];
                 }
-                $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
+                if(is_array($v[0]))
+                {
+                    $model = $model->join($v[0][0].' '.$v[0][1], $v[0][1].'.'.$v[1].'='.$join_relate, $join);
+                }
+                else
+                {
+                    $model = $model->join($v[0], $v[0].'.'.$v[1].'='.$join_relate, $join);
+                }
             }
         }
 
         if ($param) {
             $this->multiSearch();
         }
-
+        
         return $model->where($this->where)->order($this->order);
     }
 
