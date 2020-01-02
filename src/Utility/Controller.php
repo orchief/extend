@@ -8,7 +8,7 @@
 namespace Utility;
 
 use think\Controller as ThinkController;
-use think\Request;
+use think\facade\Request;
 
 class Controller extends ThinkController
 {
@@ -54,6 +54,14 @@ class Controller extends ThinkController
         if(!$bodyData){
             $bodyData = [];
         }
-        return array_replace_recursive($origin, $bodyData, $param);
+
+        $propertyName = '_' . Request::action();
+        if(property_exists($this, $propertyName) && is_array($this->$propertyName)){
+            $prefix = $this->$propertyName;
+        }else{
+            $prefix = [];
+        }
+
+        return array_replace_recursive($origin, $bodyData, $prefix, $param);
     }
 }

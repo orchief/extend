@@ -9,6 +9,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.0",
+        "topthink/framework": "5.1.*",
         "php-curl-class/php-curl-class": "^8.0",
         "swiftmailer/swiftmailer": "^6.0",
         "jenssegers/optimus": "^1.0"
