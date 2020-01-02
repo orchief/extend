@@ -62,6 +62,6 @@ class Controller extends ThinkController
             $prefix = [];
         }
 
-        return array_replace_recursive($origin, $bodyData, $prefix, $param);
+        return array_replace_recursive($prefix, $origin, $bodyData, $param);
     }
 }
