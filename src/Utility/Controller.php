@@ -48,6 +48,12 @@ class Controller extends ThinkController
      */
     protected function params($param = [])
     {
+        if(property_exists($this, 'auth') && $this->_auth){
+            $auth = ['userId' => userId()];
+        }else{
+            $auth = [];
+        }
+
         $bodyData = file_get_contents('php://input');
         $bodyData = json_decode($bodyData, true);
         $origin = $this->request->param();
@@ -62,6 +68,6 @@ class Controller extends ThinkController
             $prefix = [];
         }
 
-        return array_replace_recursive($prefix, $origin, $bodyData, $param);
+        return array_replace_recursive($prefix, $origin, $bodyData, $auth, $param);
     }
 }
