@@ -263,22 +263,18 @@ trait Url2Sql
             
             if($sorts && is_array($sorts)){
                 foreach ($sorts as $k => $v) {
-                    if (!is_numeric($k)) {
-                        $a = in_array($k, $this->sorts);
-                        $b = in_array(str_replace('-', '', $k), $this->sorts);
-    
-                        if ($a && $b) {
-                            $this->order[$v.'.'.str_replace('-', '', $k)] = 'asc';
-                        } elseif ($b) {
-                            $this->order[$v.'.'.str_replace('-', '', $k)] = 'desc';
+                    $absv = str_replace('-', '', $v);
+                    if (isset($this->sorts[$absv])) {
+                        if ($v === $absv) {
+                            $this->order[$this->sorts[$absv] . '.' . $absv] = 'asc';
+                        } else {
+                            $this->order[$this->sorts[$absv] . '.' . $absv] = 'desc';
                         }
                     } else {
-                        $a = in_array($v, $this->sorts);
-                        $b = in_array(str_replace('-', '', $v), $this->sorts);
-                        if ($a && $b) {
-                            $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'asc';
-                        } elseif ($b) {
-                            $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'desc';
+                        if ($v === $absv) {
+                            $this->order[$this->name.'.' . $absv] = 'asc';
+                        } else{
+                            $this->order[$this->name.'.' . $absv] = 'desc';
                         }
                     }
                 }
