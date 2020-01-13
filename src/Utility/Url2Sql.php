@@ -261,23 +261,25 @@ trait Url2Sql
         if ($this->sorts && isset($this->param['sorts'])) {
             $sorts = $this->str2arr($this->param['sorts']);
             
-            foreach ($sorts as $k => $v) {
-                if (!is_numeric($k)) {
-                    $a = in_array($k, $sorts);
-                    $b = in_array(str_replace('-', '', $k), $sorts);
-
-                    if ($a && $b) {
-                        $this->order[$v.'.'.str_replace('-', '', $k)] = 'asc';
-                    } elseif ($b) {
-                        $this->order[$v.'.'.str_replace('-', '', $k)] = 'desc';
-                    }
-                } else {
-                    $a = in_array($v, $sorts);
-                    $b = in_array(str_replace('-', '', $v), $sorts);
-                    if ($a && $b) {
-                        $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'asc';
-                    } elseif ($b) {
-                        $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'desc';
+            if($sorts && is_array($sorts)){
+                foreach ($sorts as $k => $v) {
+                    if (!is_numeric($k)) {
+                        $a = in_array($k, $this->sorts);
+                        $b = in_array(str_replace('-', '', $k), $this->sorts);
+    
+                        if ($a && $b) {
+                            $this->order[$v.'.'.str_replace('-', '', $k)] = 'asc';
+                        } elseif ($b) {
+                            $this->order[$v.'.'.str_replace('-', '', $k)] = 'desc';
+                        }
+                    } else {
+                        $a = in_array($v, $this->sorts);
+                        $b = in_array(str_replace('-', '', $v), $this->sorts);
+                        if ($a && $b) {
+                            $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'asc';
+                        } elseif ($b) {
+                            $this->order[$this->name.'.'.str_replace('-', '', $v)] = 'desc';
+                        }
                     }
                 }
             }
