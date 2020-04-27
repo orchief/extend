@@ -10,6 +10,7 @@
 namespace {$namespace}\controller;
 
 use app\BaseController;
+use think\annotation\Route;
 
 /**
  * @route('{$uri}')
