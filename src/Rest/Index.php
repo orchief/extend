@@ -14,6 +14,6 @@ trait Index
     {
         $param = $this->params();
         $data = $this->model()->getDataList($param);
-        result($data, $this->model()->getError());
+        result($data);
     }
 }
