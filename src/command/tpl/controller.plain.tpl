@@ -13,7 +13,7 @@ use app\BaseController;
 use think\annotation\Route;
 
 /**
- * @route('{$uri}')
+ * @route("{$uri}")
  */
 class {$class} extends BaseController
 {
