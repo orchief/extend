@@ -48,7 +48,7 @@ class Common
         // $fileList = ['Model' => 'model', 'Rest' => 'controller'];
 
         // foreach($fileList as $v => $k){
-        //     $tempTpl = \think\Facade\Env::get('root_path') . 'tpl'. DIRECTORY_SEPARATOR .'common' . DIRECTORY_SEPARATOR .$v.'.tpl';
+        //     $tempTpl = root_path() . 'tpl'. DIRECTORY_SEPARATOR .'common' . DIRECTORY_SEPARATOR .$v.'.tpl';
         //     $$v = file_get_contents($tempTpl);
         //     $$v = str_replace(array_values([ 'namespace' =>  '{$namespace}']), array_values(['namespace'     =>  $this->getNamespace()]), $$v);
         //     $path = \think\Facade\Env::get('app_path') . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . $arr[0] . DIRECTORY_SEPARATOR . 'common' .  DIRECTORY_SEPARATOR . $k;
@@ -189,9 +189,9 @@ class Common
     protected function getTplFullPath()
     {
         if ($this->input->getOption('plain')) {
-            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
+            $fullPath = root_path() . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
         } else {
-            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
+            $fullPath = root_path() . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
         }
 
         return  $fullPath;
@@ -226,7 +226,7 @@ class Common
 
         $temp = implode('/', $temp);
 
-        $res = \think\Facade\Env::get('root_path').'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).'.php';
+        $res = root_path().'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).'.php';
 
         return $res;
     }
@@ -249,7 +249,7 @@ class Common
 
         $temp = implode('/', $temp);
 
-        $res = \think\Facade\Env::get('root_path').'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).DIRECTORY_SEPARATOR;
+        $res = root_path().'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).DIRECTORY_SEPARATOR;
 
         return $res;
     }

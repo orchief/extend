@@ -72,14 +72,14 @@ class Controller extends Common implements Tpl
 
         foreach ($arr as $k => $v) {
             if ($this->input->getOption($v) or $this->input->hasParameterOption('-'.$k)) {
-                $$v = file_get_contents(\think\Facade\Env::get('root_path'). DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl/controller_'.$v.'.tpl');
+                $$v = file_get_contents(root_path(). DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl/controller_'.$v.'.tpl');
             }
 
             $str = $this->input->getOption($v);
             // 获取当前组合选项
             foreach ($arr as $kk => $vv) {
                 if ($str && strpos($str, $kk) !== false) {
-                    $$vv = file_get_contents(\think\Facade\Env::get('root_path'). DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR .  'command'. DIRECTORY_SEPARATOR .'tpl/controller_'.$vv.'.tpl');
+                    $$vv = file_get_contents(root_path(). DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR .  'command'. DIRECTORY_SEPARATOR .'tpl/controller_'.$vv.'.tpl');
                 }
             }
         }
