@@ -270,9 +270,7 @@ class Common
      */
     protected function getNamespace()
     {
-        $a = \think\Facade\Env::get('app_namespace');
-
-        return \think\Facade\Env::get('app_namespace').'\\'.implode('\\', array_slice(explode('/', $this->input->getArgument('name')), 0, -1));
+        return 'app'.'\\'.implode('\\', array_slice(explode('/', $this->input->getArgument('name')), 0, -1));
     }
 
     /**
