@@ -26,6 +26,7 @@
             "Utility\\": "src/Utility"
         },
         "files": [
+            "src/Utility/Helpers.php"
         ]
     },
     "require-dev": {
