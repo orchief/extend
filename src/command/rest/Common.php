@@ -226,7 +226,7 @@ class Common
 
         $temp = implode('/', $temp);
 
-        $res = root_path().'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).'.php';
+        $res = root_path().'app'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).'.php';
 
         return $res;
     }
@@ -249,7 +249,7 @@ class Common
 
         $temp = implode('/', $temp);
 
-        $res = root_path().'application'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).DIRECTORY_SEPARATOR;
+        $res = root_path().'app'.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $temp).DIRECTORY_SEPARATOR;
 
         return $res;
     }

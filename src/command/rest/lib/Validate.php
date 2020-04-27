@@ -206,7 +206,7 @@ class Validate extends Common implements Tpl
 
         $temp = implode('/', $temp);
 
-        $res = root_path() . 'application' . DIRECTORY_SEPARATOR . str_replace( '/', DIRECTORY_SEPARATOR, $temp) . '.php';
+        $res = root_path() . 'app' . DIRECTORY_SEPARATOR . str_replace( '/', DIRECTORY_SEPARATOR, $temp) . '.php';
 
         return $res;
     }
