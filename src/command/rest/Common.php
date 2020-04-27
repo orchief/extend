@@ -2,7 +2,7 @@
 
 namespace command\rest;
 
-use think\Db;
+use think\facade\Db;
 use think\facade\Config;
 
 class Common
@@ -78,8 +78,8 @@ class Common
      */
     protected function getDbColumnComment($field = true, $table_schema = '')
     {
-        $database = Config::get()['database'];
-        $table_schema = empty($table_schema) ? $database['database'] : $table_schema;
+        $database = Config::get('database');
+        $table_schema = empty($table_schema) ? $database['connections']['mysql']['database'] : $table_schema;
 
         // 缓存名称
         $fieldName = $field === true ? 'allField' : $field;
@@ -99,7 +99,7 @@ class Common
         }
 
         // 查询结果
-        $result = Db :: query("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ? AND table_schema = ? $columeName", $param);
+        $result = Db::query("SELECT *  FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ? AND table_schema = ? $columeName", $param);
 
         foreach ($result as $k => $v) {
             if ($v['COLUMN_NAME'] == 'userId') {
@@ -427,8 +427,8 @@ class Common
 
         $this->table = $table ? $table : $table2;
         // 接收参数
-        $database = Config::get()['database'];
-        $this->table = $database['prefix'].$this->table;
+        $database = Config::get('database');
+        $this->table = $database['connections']['mysql']['prefix'].$this->table;
 
         return $this->table;
     }
