@@ -191,7 +191,7 @@ class Common
         if ($this->input->getOption('plain')) {
             $fullPath = root_path() . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
         } else {
-            $fullPath = root_path() . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
+            $fullPath = root_path() . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.tpl';
         }
 
         return  $fullPath;
