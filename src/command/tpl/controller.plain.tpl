@@ -9,12 +9,12 @@
 
 namespace {$namespace}\controller;
 
-use Utility\Controller;
+use app\BaseController;
 
 /**
  * @route('{$uri}')
  */
-class {$class} extends Controller
+class {$class} extends BaseController
 {
     public $modelName = '{$class}';{$read}{$create}{$update}{$delete}
 }
