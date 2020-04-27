@@ -7,7 +7,7 @@
 namespace Utility;
 
 use think\Validate as ThinkValidate;
-use think\Db;
+use think\facade\Db;
 
 class Validate extends ThinkValidate
 {

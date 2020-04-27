@@ -9,7 +9,7 @@ use think\console\Input;
 use think\console\Output;
 use think\console\input\Argument;
 use think\console\input\Option;
-use think\Db;
+use think\facade\Db;
 use think\facade\Config;
 
 class rest extends Command

@@ -1,6 +1,6 @@
 <?php
 namespace command\rest\lib;
-use think\Db;
+use think\facade\Db;
 use command\rest\Tpl;
 use command\rest\Common;
 /**

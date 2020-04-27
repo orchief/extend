@@ -4,7 +4,7 @@
 // +----------------------------------------------------------------------
 namespace com;
 
-use think\Db;
+use think\facade\Db;
 
 class HonrayAuth{
 

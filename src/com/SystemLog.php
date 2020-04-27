@@ -6,7 +6,7 @@
 namespace com;
 
 use think\Config;
-use think\Db;
+use think\facade\Db;
 
 // 数据表
 /*
