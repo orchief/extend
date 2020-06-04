@@ -68,9 +68,8 @@ class JWT
         // 检查 static::$decoded
         if ([] == static::$preload) {
             // 生成用户秘钥
-            if (isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION']) {
-                $authorization = $_SERVER['HTTP_AUTHORIZATION'];
-            } else {
+            $authorization = \think\facade\Request::header('authorization');
+            if (!$authorization) {
                 if($name){
                     return null;
                 }else{
@@ -78,7 +77,7 @@ class JWT
                 }
             }
             $authorization = str_replace('Bearer ', '', $authorization);
-            
+
             if($key == null){
                 $key = Config::get('app.jwt.key'); // 签名秘钥
             }

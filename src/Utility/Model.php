@@ -5,6 +5,7 @@ namespace Utility;
 /*
  * 一键生成rest接口
  */
+
 use think\Model as ThinkModel;
 use think\facade\Config;
 
@@ -101,7 +102,7 @@ class Model extends ThinkModel
     /**
      * 隐藏字段 无法查询的字段 read / index不显示的字段.
      *
-     * @var bool
+     * @var array
      */
     protected $hidden = ['userId'];
     /**
@@ -143,22 +144,12 @@ class Model extends ThinkModel
      */
     public function getDataList($param)
     {
-        if (isset($param['page'])) {
-            $res = $this->parseUrl($param)->select();
-            $total = $this->getTotals($param)->count();
-            // $res = $this->modelToArray($res);
-            $res = $this->filter($res);
-            $resData['list'] = $res;
-            $resData['dataCount'] = $total;
-
-            return $resData;
-        } else {
-            $res = $this->parseUrl($param)->select();
-
-            $res = $this->filter($res);
-
-            return $res;
-        }
+        $res = $this->parseUrl($param)->select();
+        $total = $this->getTotals($param)->count();
+        $res = $this->filter($res);
+        $resData['list'] = $res;
+        $resData['dataCount'] = $total;
+        return $resData;
     }
 
     /**
@@ -168,8 +159,7 @@ class Model extends ThinkModel
      */
     public function getDataById($id)
     {
-        $res = $this->parseUrl([])->where($this->name.'.'.$this->pk, $id)->find();
-        // $res = $model->field($this->returnFields)->where($this->name.'.'.$this->pk, $id)->find();
+        $res = $this->parseUrl([])->where($this->name . '.' . $this->pk, $id)->find();
 
         $res = $this->filter([$res])[0];
 
@@ -186,10 +176,10 @@ class Model extends ThinkModel
         // 联合查询
         if ($this->leftJoin) {
             foreach ($this->leftJoin as $k => $v) {
-                $this->join($v[0], $v[0].'.'.$v[1].'='.$this->name.'.'.$v[2], 'LEFT');
+                $this->join($v[0], $v[0] . '.' . $v[1] . '=' . $this->name . '.' . $v[2], 'LEFT');
             }
         }
-        $res = $this->field($this->returnFields)->where($this->name.'.'.$this->pk, $id)->where(['userId' => $userId])->find();
+        $res = $this->field($this->returnFields)->where($this->name . '.' . $this->pk, $id)->where(['userId' => $userId])->find();
 
         $res = $this->filter([$res])[0];
 
@@ -220,11 +210,11 @@ class Model extends ThinkModel
      */
     public function map(&$field)
     {
-        if($field ){
+        if ($field) {
             // json 格式化字段
             if ($this->jsonFields) {
                 foreach ($this->jsonFields as $k => $v) {
-                    if($field){
+                    if ($field) {
                         $field[$v] = json_decode($field[$v], true);
                     }
                 }
@@ -278,11 +268,57 @@ class Model extends ThinkModel
      *
      * @param array $param [description]
      */
+    public function batch($param, $id, $fields = true, $pk = 'id')
+    {
+        $new_param = [];
+        foreach ($this->batchField as $k => $v) {
+            if (isset($param[$v])) {
+                $new_param[$v] = $param[$v];
+            }
+        }
+        // 验证
+        // $validate = validate($this->name);
+        // continue_if($validate->hasScene('update') && $validate->scene('update')->check($new_param), ['msg' => $validate->getError()]);
+
+        // $a = $validate->scene('update')->check($new_param);
+
+
+        // json 格式化字段
+        if ($this->jsonFields) {
+            foreach ($this->jsonFields as $k => $v) {
+                foreach ($new_param as $kk => $vv) {
+                    if ($kk === $v) {
+                        $new_param[$v] = toJson($vv);
+                    }
+                }
+            }
+        }
+
+        // 模板设置了
+        if ($pk != 'id' && $this->pk) {
+            $pk = $this->pk;
+        }
+
+        try {
+            $this->allowField($fields)->where($pk, 'in', $id)->update($new_param);
+        } catch (\Exception $e) {
+            if (Config::get('app_debug')) {
+                abort(['msg' => $e->getMessage()]);
+            }
+            abort(['msg' => '编辑失败!']);
+        }
+    }
+
+    /**
+     * 通过主键id修改用户.
+     *
+     * @param array $param [description]
+     */
     public function updateDataById($param, $id, $fields = true, $pk = 'id')
     {
         // 验证
-        $validate = validate($this->name);
-        continue_if(!$validate->hasScene('update') or $validate->scene('update')->check($param), ['msg' => $validate->getError()]);
+        // $validate = validate($this->name);
+        // continue_if(!$validate->hasScene('update') or $validate->scene('update')->check($param), ['msg' => $validate->getError()]);
 
         // json 格式化字段
         if ($this->jsonFields) {
@@ -296,12 +332,12 @@ class Model extends ThinkModel
         }
 
         // 模板设置了
-        if($pk != 'id' && $this->pk){
+        if ($pk != 'id' && $this->pk) {
             $pk = $this->pk;
         }
 
         try {
-            $this->allowField($fields)->save($param, [$pk => $id]);
+            $this->allowField($fields)->where($pk, 'in', $id)->update($param);
         } catch (\Exception $e) {
             if (Config::get('app_debug')) {
                 abort(['msg' => $e->getMessage()]);
@@ -318,8 +354,8 @@ class Model extends ThinkModel
     public function updateUserDataById($param, $id, $fields = true, $pk = 'id')
     {
         // 验证
-        $validate = validate($this->name);
-        continue_if(!$validate->hasScene('update') or $validate->scene('update')->check($param), ['msg' => $validate->getError()]);
+        // $validate = validate($this->name);
+        // continue_if(!$validate->hasScene('update') or $validate->scene('update')->check($param), ['msg' => $validate->getError()]);
 
         // json 格式化字段
         if ($this->jsonFields) {
@@ -333,7 +369,12 @@ class Model extends ThinkModel
         }
 
         try {
-            $this->allowField($fields)->where(['userId' => $param['userId'], $pk => $id])->update($param);
+            $this->allowField($fields)->where(
+                [
+                    ['userId', '=', $param['userId']],
+                    [$pk, 'in', $id]
+                ]
+            )->update($param);
         } catch (\Exception $e) {
             if (Config::get('app_debug')) {
                 abort(['msg' => $e->getMessage()]);
@@ -560,12 +601,12 @@ class Model extends ThinkModel
         $res = [];
         $param['page'] = 1;
         $param['limit'] = 10;
-        if(is_array($field)){
+        if (is_array($field)) {
             foreach ($field as $key => $value) {
                 $res[$value] = $this->getTotals($param)->sum($value);
             }
         }
-        
+
         return $res;
     }
 }

@@ -18,8 +18,7 @@ trait Deletes
             ->where($this->model()->getPk(), 'in', $param['ids'])
             ->delete();
         }else{
-            $res = $this->model()
-            ->deletes($param);
+            abort(['msg' => '删除失败!']);
         }
 
         result(['msg' => '删除成功!', 'deleteCount' => $res]);
