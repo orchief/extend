@@ -24,6 +24,8 @@ class Model extends Common implements Tpl
         'ranges' => '{$ranges}',
         'dbType' => '{$dbType}',
         'jsonFields' => '{$jsonFields}',
+        'sorts' => '{$sorts}',
+        'whereIn' => '{$whereIn}',
     ];
 
     /**
@@ -43,6 +45,8 @@ class Model extends Common implements Tpl
         'ranges' => '',
         'dbType' => 'Model',
         'jsonFields' => '',
+        'sorts' => '',
+        'whereIn'   => ''
     ];
 
     /**
@@ -55,7 +59,7 @@ class Model extends Common implements Tpl
     public function _init()
     {
         $this->setTplValues([
-            'Description' => trim($this->input->getOption('Description')),
+            'Description' => trim($this->input->getOption('Explain')),
             'Author' => trim($this->input->getOption('Author')),
             'Date' => date('Y-m-d H:i:s'),
             'namespace' => $this->getNamespace(),
@@ -65,6 +69,8 @@ class Model extends Common implements Tpl
             'is' => $this->is,
             'ranges' => $this->ranges,
             'jsonFields' => $this->jsonFields,
+            'sorts' =>  $this->sorts,
+            'whereIn'   =>  $this->whereIn
         ]);
     }
 }

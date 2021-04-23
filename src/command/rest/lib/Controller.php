@@ -45,7 +45,7 @@ class Controller extends Common implements Tpl
     {
         $uri = strtolower(convertUnderline(trim($this->input->getArgument('name'))));
         $this->setTplValues([
-            'Description' => trim($this->input->getOption('Description')),
+            'Description' => trim($this->input->getOption('Explain')),
             'Author' => trim($this->input->getOption('Author')),
             'Date' => date('Y-m-d H:i:s'),
             'namespace' => $this->getNamespace(),

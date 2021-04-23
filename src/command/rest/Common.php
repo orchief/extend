@@ -23,6 +23,8 @@ class Common
     protected $scene_update = '';
     protected $postman = '';
     protected $jsonFields = '';
+    protected $sorts = '';
+    protected $whereIn = '';
 
     public function __construct($config)
     {
@@ -31,33 +33,7 @@ class Common
         $this->output = $this->config['output'];
         $this->getDbColumnComment();
         $this->getSwaggerParams();
-        $this->createCommon();
         $this->_init();
-    }
-
-    /**
-     * 检测并创建公共文件.
-     */
-    public function createCommon()
-    {
-        // // 检查是否已存在
-        // $name = trim($this->input->getArgument('name'));
-
-        // $arr = explode('/', $name);
-
-        // $fileList = ['Model' => 'model', 'Rest' => 'controller'];
-
-        // foreach($fileList as $v => $k){
-        //     $tempTpl = \think\Facade\Env::get('root_path') . 'tpl'. DIRECTORY_SEPARATOR .'common' . DIRECTORY_SEPARATOR .$v.'.tpl';
-        //     $$v = file_get_contents($tempTpl);
-        //     $$v = str_replace(array_values([ 'namespace' =>  '{$namespace}']), array_values(['namespace'     =>  $this->getNamespace()]), $$v);
-        //     $path = \think\Facade\Env::get('app_path') . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . $arr[0] . DIRECTORY_SEPARATOR . 'common' .  DIRECTORY_SEPARATOR . $k;
-        //     is_dir($path) OR mkdir($path, 0777, true);
-        //     $filename = $path . DIRECTORY_SEPARATOR . $v . ".php";
-        //     if(!is_file($filename)){
-        //         file_put_contents($filename, $$v);
-        //     }
-        // }
     }
 
     /**
@@ -136,6 +112,7 @@ class Common
         if (is_array($name)) {
             $this->tplValues = array_replace_recursive($this->tplValues, $name);
         } elseif (is_string($name)) {
+
             $this->tplValues = array_replace_recursive($this->tplValues, [$name => $value]);
         }
 
@@ -191,7 +168,7 @@ class Common
         if ($this->input->getOption('plain')) {
             $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.plain.tpl';
         } else {
-            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$tplName.'.tpl';
+            $fullPath = \think\Facade\Env::get('root_path') . DIRECTORY_SEPARATOR . 'vendor'.DIRECTORY_SEPARATOR.'orchief'.DIRECTORY_SEPARATOR.'utility'.DIRECTORY_SEPARATOR.'src' .DIRECTORY_SEPARATOR . 'command'. DIRECTORY_SEPARATOR .'tpl'.DIRECTORY_SEPARATOR.$this->getTplName($this->typeName).'.tpl';
         }
 
         return  $fullPath;
@@ -302,7 +279,7 @@ class Common
     *         description="'.$v['COLUMN_COMMENT'].'",
     *         required=false,
     *         @OA\Schema(
-    *             type="'.$this->getFieldType($v['DATA_TYPE']).'",
+    *             type="'.$this->getFieldType($v).'",
     *             format="string",
     *         )
     *     ),
@@ -310,7 +287,7 @@ class Common
             $this->swaggerItems .= '*                   @OA\Property(
     *                       property="'.$v['COLUMN_NAME'].'",
     *                       description="'.$v['COLUMN_COMMENT'].'",
-    *                       type="'.$this->getFieldType($v['DATA_TYPE']).'"
+    *                       type="'.$this->getFieldType($v).'"
     *               ),
     ';
         }
@@ -321,7 +298,7 @@ class Common
             }
 
             // 字段类型为 int
-            if ($this->getFieldType($v['DATA_TYPE']) == 'integer') {
+            if ($this->getFieldType($v) == 'integer') {
                 if ($this->input->hasParameterOption('-a')) {
                     $this->is .= '"userId",';
                 }
@@ -329,18 +306,27 @@ class Common
             }
 
             // 字段类型为 string
-            if ($this->getFieldType($v['DATA_TYPE']) == 'string') {
+            if ($this->getFieldType($v) == 'string') {
                 $this->like .= '"'.$v['COLUMN_NAME'].'",';
             }
 
             // 字段类型为 date
-            if ($this->getFieldType($v['DATA_TYPE']) == 'date') {
+            if ($this->getFieldType($v) == 'time' ) {
                 $this->ranges .= '"'.$v['COLUMN_NAME'].'",';
             }
 
+            if($this->getFieldType($v) == 'integer'){
+                $this->whereIn .= '"'.$v['COLUMN_NAME'].'",';
+            }
+
             // 字段类型为 json
-            if ($this->getFieldType($v['DATA_TYPE']) == 'json') {
+            if ($this->getFieldType($v) == 'json') {
                 $this->jsonFields .= '"'.$v['COLUMN_NAME'].'",';
+            }
+
+            // 字段类型为 time
+            if ($this->getFieldType($v) == 'time') {
+                $this->sorts .= '"-'.$v['COLUMN_NAME'].'",';
             }
         }
     }
@@ -362,11 +348,28 @@ class Common
      *
      * @param [type] $originType
      */
-    protected function getFieldType($originType)
+    protected function getFieldType($v)
     {
+        $timetype = [
+            'bigint', 'int', 'timestamp', 'datetime', 'date'
+        ];
+        if(in_string('time', $v['COLUMN_NAME']) && \in_array($v['DATA_TYPE'], $timetype)){
+            return 'time';
+        }
+
+        $passtype = [
+            'varchar', 'char', 'text', 'longtext'
+        ];
+
+        if( (in_string('word', $v['COLUMN_NAME']) || in_string('pass', $v['COLUMN_NAME']) ) && \in_array($v['DATA_TYPE'], $passtype)){
+            return 'password';
+        }
+
         // return $originType;
-        switch ($originType) {
+        switch ($v['DATA_TYPE']) {
             case 'bigint':
+                return 'integer';
+            case 'int':
                 return 'integer';
             case 'tinyint':
                 return 'integer';
