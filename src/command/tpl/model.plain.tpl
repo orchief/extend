@@ -20,7 +20,7 @@ class {$class} extends {$dbType}
      *
      * @var string
      */
-    protected $sorts = ['createTime'];
+    protected $sorts = [{$sorts}];
     /**
      * 允许主表 模糊查询的字段
      *
@@ -39,6 +39,11 @@ class {$class} extends {$dbType}
      * @var array
      */
     protected $ranges = [{$ranges}];
+    /**
+     * 对应sql的where in 查询
+     * @var array
+     */
+    protected $whereIn = [{$whereIn}];
     /**
      * 联合查询
      *
@@ -85,7 +90,7 @@ class {$class} extends {$dbType}
      * 隐藏字段
      * @var boolean
      */
-    protected $hidden = ['userId'];
+    protected $hidden = ['user_id'];
     /**
      * 显示字段
      * @var boolean

@@ -10,10 +10,9 @@
 namespace {$namespace}\controller;
 
 use Utility\Controller;
-use think\annotation\route\Resource;
 
- /**
- * @Resource("{$uri}")
+/**
+ * @route('{$uri}')
  */
 class {$class} extends Controller
 {
